@@ -3,9 +3,8 @@ package classes;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.time.LocalDate;
-import java.time.Month;
-import java.time.Year;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class Task
@@ -15,6 +14,9 @@ public class Task
     private int taskId;
     @JsonProperty("taskName")
     private String taskName;
+
+    @JsonProperty("category")
+    private String category;
 
     @JsonProperty("description")
     private String description;
@@ -28,13 +30,18 @@ public class Task
     @JsonProperty("state")
     private boolean state = false;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
+    private LocalDateTime endDateTime;
+
     public Task(){}
     // Construtor para NOVAS tarefas (gera ID aleatório)
-    public Task(String taskName, String description, LocalDate endDate, int priority) {
+    public Task(String taskName,String category, String description, LocalDate endDate,LocalDateTime endDateTime, int priority) {
         this.taskName = taskName;
+        this.category = category;
         this.taskId = generateRandomId();
         this.description = description;
         this.endDate = endDate;
+        this.endDateTime = endDateTime;
         this.priority = priority;
         this.state = false;
     }
@@ -102,6 +109,7 @@ public class Task
         }
 
         this.endDate = newDate;
+        this.endDateTime = null;
 
         // Só exibe a mensagem se a data realmente tiver sido alterada
         if (!this.endDate.equals(newDate)) {
@@ -109,11 +117,12 @@ public class Task
         }
     }
 
-    public void setPriority(int priority) {
+    public boolean setPriority(int priority) {
         if (priority < 1 || priority > 3) {
             throw new IllegalArgumentException("❌ Prioridade inválida! Deve ser 1, 2 ou 3.");
         }
         this.priority = priority;
+        return true;
     }
 
     public void displayTask()
@@ -121,8 +130,9 @@ public class Task
         System.out.println("\n----------- Detalhes da Tarefa -----------");
         System.out.println("ID: " + taskId);
         System.out.println("Nome: " + taskName);
+        if(category!=null) {System.out.println("Categoria: " + category);}
         System.out.println("Descrição: " + description);
-        System.out.println("Data de vencimento: " + endDate);
+        System.out.println("Data de vencimento: " + (endDateTime != null ? endDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")) : endDate));
         System.out.println("Prioridade: " + priority);
         System.out.println("Estado: " + (state ? "Concluída ✅" : "Pendente ❌"));
         System.out.println("-----------------------------\n");
@@ -172,10 +182,8 @@ public class Task
                         System.out.print("Nova prioridade (1- Baixa, 2- Média, 3- Alta): ");
                         newPriority = scanner.nextInt();
                         scanner.nextLine();
-                    } while (newPriority < 1 || newPriority > 3);
-                    this.priority = newPriority;
+                    } while (!setPriority(newPriority));
                     break;
-
                 case 5:
                     markAsDone();
                     System.out.println("✅ Tarefa marcada como concluída!");
@@ -195,18 +203,40 @@ public class Task
         String taskName = scanner.nextLine();
         System.out.print("Descrição: ");
         String description = scanner.nextLine();
+        System.out.print("Categoria da tarefa(ex: Trabalho, Estudos, Pessoal)   ): ");
+        String category = scanner.nextLine();
 
-        Task newTask = new Task(taskName, description, LocalDate.now(), 1);
-
+        LocalDate newDate = null;
         boolean validDate = false;
         while (!validDate) {
             System.out.print("Data de vencimento (YYYY-MM-DD): ");
             try {
-                LocalDate newDate = LocalDate.parse(scanner.nextLine());
-                newTask.setEndDate(newDate);
+                newDate = LocalDate.parse(scanner.nextLine());
                 validDate = true;
             } catch (Exception e) {
                 System.out.println("❌ Formato inválido! Use YYYY-MM-DD.");
+            }
+        }
+
+        LocalDateTime endDateTime = null;
+        System.out.print("Pretende adicionar hora à sua tarefa (s/n)? ");
+        String choice = scanner.nextLine().trim().toLowerCase();
+
+        if (choice.equals("s")) {
+            boolean validTime = false;
+            while (!validTime) {
+                System.out.print("Digite a hora de vencimento da tarefa (HH:MM): ");
+                try {
+                    LocalTime localTime = LocalTime.parse(scanner.nextLine(), DateTimeFormatter.ofPattern("HH:mm"));
+                    endDateTime = LocalDateTime.of(newDate, localTime);
+                    if (endDateTime.isBefore(LocalDateTime.now())) {
+                        System.out.println("❌ A data e hora já passaram! Escolha um momento futuro.");
+                    } else {
+                        validTime = true;
+                    }
+                } catch (Exception e) {
+                    System.out.println("❌ Formato inválido! Use HH:MM.");
+                }
             }
         }
 
@@ -217,7 +247,7 @@ public class Task
             scanner.nextLine();
         } while (priority < 1 || priority > 3);
 
-        newTask.setPriority(priority);
+        Task newTask = new Task(taskName,category, description, newDate, endDateTime, priority);
 
         filehandler.writeTask(newTask);
 

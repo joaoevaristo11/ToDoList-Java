@@ -1,36 +1,73 @@
 [ {
   "taskId" : 8372,
   "endDate" : "2025-02-25",
+  "endDateTime" : null,
   "taskName" : "a",
+  "category" : null,
   "description" : "a",
   "priority" : 1,
   "state" : true
 }, {
   "taskId" : 4499,
   "endDate" : "2025-02-25",
+  "endDateTime" : null,
   "taskName" : "a",
+  "category" : null,
   "description" : "0",
   "priority" : 2,
   "state" : true
 }, {
   "taskId" : 5375,
   "endDate" : "2025-02-24",
+  "endDateTime" : null,
   "taskName" : "ç",
+  "category" : null,
   "description" : "ç",
   "priority" : 1,
   "state" : false
 }, {
   "taskId" : 4635,
   "endDate" : "2025-02-24",
+  "endDateTime" : null,
   "taskName" : "l",
+  "category" : null,
   "description" : "l",
   "priority" : 2,
   "state" : false
 }, {
   "taskId" : 6698,
   "endDate" : "2025-02-28",
+  "endDateTime" : null,
   "taskName" : "ç",
+  "category" : null,
   "description" : "ç",
   "priority" : 3,
   "state" : true
+}, {
+  "taskId" : 5074,
+  "endDate" : "2025-02-28",
+  "endDateTime" : "2025-02-28 23:02",
+  "taskName" : "aaa",
+  "category" : null,
+  "description" : "aaa",
+  "priority" : 2,
+  "state" : true
+}, {
+  "taskId" : 9706,
+  "endDate" : "2025-05-04",
+  "endDateTime" : null,
+  "taskName" : "aaa",
+  "category" : "Trabalho",
+  "description" : "aaa",
+  "priority" : 1,
+  "state" : false
+}, {
+  "taskId" : 4472,
+  "endDate" : "2025-05-04",
+  "endDateTime" : null,
+  "taskName" : "lalal",
+  "category" : "Estudos",
+  "description" : "akaaka",
+  "priority" : 2,
+  "state" : false
 } ]
