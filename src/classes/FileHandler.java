@@ -2,18 +2,20 @@ package classes;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.type.TypeReference;
-import interfaces.TaskStorage;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
+import interfaces.TaskStorage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class FileHandler implements TaskStorage {
-    private static final String FILE_PATH = "C:\\Programming\\Java\\Nova pasta\\ToDo\\src\\tasks.json";
-    private static final ObjectMapper objectMapper = new ObjectMapper();
+    private static final String FILE_PATH = "C:\\Programming\\Java\\Projetos\\ToDoList\\ToDo\\src\\tasks.json";
+    private static final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
 
-    @Override
+
+        @Override
     public void writeTask(Task task) {
         List<Task> tasks = readTasks();
         tasks.add(task);
@@ -53,6 +55,14 @@ public class FileHandler implements TaskStorage {
         saveTasksToFile(tasks);
     }
 
+    @Override
+    public Task getTaskById(int taskId) {
+        return readTasks().stream()
+                .filter(task -> task.getTaskId() == taskId)
+                .findFirst()
+                .orElse(null);
+    }
+
     private void saveTasksToFile(List<Task> tasks) {
         try {
             objectMapper.writerWithDefaultPrettyPrinter().writeValue(new File(FILE_PATH), tasks);
@@ -60,16 +70,4 @@ public class FileHandler implements TaskStorage {
             e.printStackTrace();
         }
     }
-
-    public Task getTaskById(int taskId) {
-        List<Task> tasks = readTasks(); // Lê todas as tarefas do arquivo
-        for (Task task : tasks) {
-            if (task.getTaskId() == taskId) {
-                return task;
-            }
-        }
-        return null; // Retorna null se não encontrar a tarefa
-    }
-
 }
-

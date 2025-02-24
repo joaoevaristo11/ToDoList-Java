@@ -1,6 +1,6 @@
 package interfaces;
-import classes.Task;
 
+import classes.Task;
 import java.util.List;
 
 public interface TaskStorage {
@@ -8,5 +8,5 @@ public interface TaskStorage {
     List<Task> readTasks();
     void deleteTask(int taskId);
     void updateTaskInFile(Task updatedTask);
+    Task getTaskById(int taskId);
 }
-

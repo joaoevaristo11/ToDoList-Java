@@ -1,34 +1,34 @@
 package classes;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.Year;
-import java.util.HashSet;
-import java.util.Random;
-import java.util.Scanner;
-import java.util.Set;
+import java.util.*;
 
 public class Task
 {
     private static final Random random = new Random();
-    private static final Set<Integer> usedIds = new HashSet<>();
-    private String taskName;
+    private static final FileHandler filehandler = new FileHandler();
     private int taskId;
+    @JsonProperty("taskName")
+    private String taskName;
+
+    @JsonProperty("description")
     private String description;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate endDate;
+
+    @JsonProperty("priority")
     private int priority;
-    private boolean done = false;
 
-    // Construtor principal (usado para carregar tarefas já existentes)
-    public Task(String taskName, int taskId, String description, LocalDate endDate, int priority, boolean state) {
-        this.taskName = taskName;
-        this.taskId = taskId;
-        this.description = description;
-        this.endDate = endDate;
-        this.priority = priority;
-        this.done = state;
-    }
+    @JsonProperty("state")
+    private boolean state = false;
 
+    public Task(){}
     // Construtor para NOVAS tarefas (gera ID aleatório)
     public Task(String taskName, String description, LocalDate endDate, int priority) {
         this.taskName = taskName;
@@ -36,7 +36,7 @@ public class Task
         this.description = description;
         this.endDate = endDate;
         this.priority = priority;
-        this.done = false;
+        this.state = false;
     }
 
     public int getPriority()
@@ -46,7 +46,7 @@ public class Task
 
     public boolean getState()
     {
-        return this.done;
+        return this.state;
     }
 
     public int getTaskId()
@@ -54,13 +54,20 @@ public class Task
         return this.taskId;
     }
 
-    public boolean markAsDone()
+    public void markAsDone()
     {
-        return done=true;
+        this.state=true;
     }
 
     private int generateRandomId()
     {
+        List<Task> tasks = filehandler.readTasks();
+        Set<Integer> usedIds = new HashSet<>();
+        for(Task task:tasks)
+        {
+            usedIds.add(task.getTaskId());
+        }
+
         int id;
         do{id = random.nextInt(9000)+1000;}while(usedIds.contains(id));
 
@@ -68,44 +75,39 @@ public class Task
         return id;
     }
 
-    public void setEndDate(LocalDate newDate) {  // Tornar pública
+    public void setEndDate(LocalDate newDate) {
         LocalDate now = LocalDate.now();
+        boolean validate = true;
+        while (validate) {
+            int month = newDate.getMonthValue();
+            int day = newDate.getDayOfMonth();
+            int year = newDate.getYear();
+            int maxDays = Month.of(month).length(Year.isLeap(year));
 
-        if (newDate.isBefore(now)) {
-            System.out.println("❌ Erro: A data já passou! Escolha uma data futura.");
-            return;
-        }
+            if (newDate.isBefore(now)) {
+                System.out.println("❌ Erro: A data já passou! Escolha uma data futura.");
+            }
 
-        int month = newDate.getMonthValue();
-        int day = newDate.getDayOfMonth();
-        int year = newDate.getYear();
-        int maxDays = Month.of(month).length(Year.isLeap(year));
+            if (day > maxDays || day < 1) {
+                System.out.println("❌ Erro: O dia " + day + " não é válido no mês " + month + ".");
 
-        if (day > maxDays || day < 1) {
-            System.out.println("❌ Erro: O dia " + day + " não é válido no mês " + month + ".");
-            return;
-        }
-
-        if (year > now.getYear() + 25) {
-            System.out.println("❌ Erro: O ano " + year + " está demasiado distante no futuro.");
-            return;
-        }
-
-        this.endDate = newDate;
-        System.out.println("✅ Data de vencimento definida para: " + this.endDate);
-    }
-
-    public boolean setPriority(int priority) {
-        if (priority >= 1 && priority <= 3) {
-            this.priority = priority;
-            return true;
-        } else {
-            System.out.println("❌ Prioridade inválida!");
-            return false;
+            } else if (year > now.getYear() + 25) {
+                System.out.println("❌ Erro: O ano " + year + " está demasiado distante no futuro.");
+                return;
+            } else {
+                this.endDate = newDate;
+                System.out.println("✅ Data de vencimento definida para: " + this.endDate);
+                validate = false;
+            }
         }
     }
 
-
+    public void setPriority(int priority) {
+        if (priority < 1 || priority > 3) {
+            throw new IllegalArgumentException("❌ Prioridade inválida! Deve ser 1, 2 ou 3.");
+        }
+        this.priority = priority;
+    }
 
     public void displayTask()
     {
@@ -115,7 +117,7 @@ public class Task
         System.out.println("Descrição: " + description);
         System.out.println("Data de vencimento: " + endDate);
         System.out.println("Prioridade: " + priority);
-        System.out.println("Estado: " + (done ? "Concluída ✅" : "Pendente ❌"));
+        System.out.println("Estado: " + (state ? "Concluída ✅" : "Pendente ❌"));
         System.out.println("-----------------------------\n");
     }
 
@@ -201,19 +203,17 @@ public class Task
             }
         }
 
-        // Prioridade
         int priority;
         do {
             System.out.print("Prioridade (1- Baixa, 2- Média, 3- Alta): ");
             priority = scanner.nextInt();
             scanner.nextLine();
-        } while (!newTask.setPriority(priority));
-        // Escrever no ficheiro JSON
-        FileHandler.writeTask(newTask);
+        } while (priority < 1 || priority > 3);
+
+        newTask.setPriority(priority);
+
+        filehandler.writeTask(newTask);
 
         System.out.println("✅ Tarefa criada e guardada com sucesso!\n");
-
     }
-
-
 }
