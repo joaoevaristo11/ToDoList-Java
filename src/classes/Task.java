@@ -76,29 +76,36 @@ public class Task
     }
 
     public void setEndDate(LocalDate newDate) {
+        if (this.endDate != null && this.endDate.equals(newDate)) {
+            return;  // Se a data não mudou, não faz nada
+        }
+
         LocalDate now = LocalDate.now();
-        boolean validate = true;
-        while (validate) {
-            int month = newDate.getMonthValue();
-            int day = newDate.getDayOfMonth();
-            int year = newDate.getYear();
-            int maxDays = Month.of(month).length(Year.isLeap(year));
+        int month = newDate.getMonthValue();
+        int day = newDate.getDayOfMonth();
+        int year = newDate.getYear();
+        int maxDays = Month.of(month).length(Year.isLeap(year));
 
-            if (newDate.isBefore(now)) {
-                System.out.println("❌ Erro: A data já passou! Escolha uma data futura.");
-            }
+        if (newDate.isBefore(now)) {
+            System.out.println("❌ Erro: A data já passou! Escolha uma data futura.");
+            return;
+        }
 
-            if (day > maxDays || day < 1) {
-                System.out.println("❌ Erro: O dia " + day + " não é válido no mês " + month + ".");
+        if (day > maxDays || day < 1) {
+            System.out.println("❌ Erro: O dia " + day + " não é válido no mês " + month + ".");
+            return;
+        }
 
-            } else if (year > now.getYear() + 25) {
-                System.out.println("❌ Erro: O ano " + year + " está demasiado distante no futuro.");
-                return;
-            } else {
-                this.endDate = newDate;
-                System.out.println("✅ Data de vencimento definida para: " + this.endDate);
-                validate = false;
-            }
+        if (year > now.getYear() + 25) {
+            System.out.println("❌ Erro: O ano " + year + " está demasiado distante no futuro.");
+            return;
+        }
+
+        this.endDate = newDate;
+
+        // Só exibe a mensagem se a data realmente tiver sido alterada
+        if (!this.endDate.equals(newDate)) {
+            System.out.println("✅ Data de vencimento definida para: " + this.endDate);
         }
     }
 
@@ -134,7 +141,7 @@ public class Task
             System.out.println("4. Prioridade");
             System.out.println("5. Estado (Concluir tarefa)");
             System.out.println("0. Cancelar edição");
-            System.out.println("\nInput (0-5): ");
+            System.out.print("\nInput (0-5): ");
             int option = scanner.nextInt();
             scanner.nextLine();
             switch (option)
@@ -145,24 +152,24 @@ public class Task
                     break;
                 case 1:
                     System.out.println("Nome atual: "+this.taskName);
-                    System.out.println("Novo nome: ");
+                    System.out.print("Novo nome: ");
                     this.taskName = scanner.nextLine();
                     break;
                 case 2:
                     System.out.println("Descrição atual: "+this.description);
-                    System.out.println("Nova descrição: ");
+                    System.out.print("Nova descrição: ");
                     this.description = scanner.nextLine();
                     break;
                 case 3:
                     System.out.println("Data de Vencimento atual: "+this.endDate);
-                    System.out.println("Nova Data de Vencimento(no formato YYYY-MM-DD): ");
+                    System.out.print("Nova Data de Vencimento(no formato YYYY-MM-DD): ");
                     setEndDate(LocalDate.parse(scanner.nextLine()));
                     break;
                 case 4:
                     System.out.println("Prioridade atual: " + this.priority);
                     int newPriority;
                     do {
-                        System.out.println("Nova prioridade (1- Baixa, 2- Média, 3- Alta): ");
+                        System.out.print("Nova prioridade (1- Baixa, 2- Média, 3- Alta): ");
                         newPriority = scanner.nextInt();
                         scanner.nextLine();
                     } while (newPriority < 1 || newPriority > 3);

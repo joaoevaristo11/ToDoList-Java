@@ -14,8 +14,7 @@ public class FileHandler implements TaskStorage {
     private static final String FILE_PATH = "C:\\Programming\\Java\\Projetos\\ToDoList\\ToDo\\src\\tasks.json";
     private static final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
 
-
-        @Override
+    @Override
     public void writeTask(Task task) {
         List<Task> tasks = readTasks();
         tasks.add(task);
@@ -57,10 +56,13 @@ public class FileHandler implements TaskStorage {
 
     @Override
     public Task getTaskById(int taskId) {
-        return readTasks().stream()
-                .filter(task -> task.getTaskId() == taskId)
-                .findFirst()
-                .orElse(null);
+        List<Task> tasks = readTasks();
+        for (Task task : tasks) {
+            if (task.getTaskId() == taskId) {
+                return task; // Retorna a tarefa assim que a encontra
+            }
+        }
+        return null; // Se não encontrar, retorna null
     }
 
     private void saveTasksToFile(List<Task> tasks) {
