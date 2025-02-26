@@ -9,4 +9,6 @@ public interface TaskOperations {
     void deleteTask(int taskId);
     void showTasks();
     Task getTaskById(int taskId);
+    void searchTasks(String string);
+    void sortTask(String option);
 }

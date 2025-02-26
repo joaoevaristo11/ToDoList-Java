@@ -43,4 +43,14 @@ public class TaskService implements interfaces.TaskOperations {
     public Task getTaskById(int taskId) {
         return filehandler.getTaskById(taskId);
     }
+
+    @Override
+    public void searchTasks(String string) {
+        Task.searchTasks(string);
+    }
+
+    @Override
+    public void sortTask(String option) {
+        Task.sortTask(option);
+    }
 }

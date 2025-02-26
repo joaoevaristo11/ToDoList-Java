@@ -60,14 +60,5 @@
   "category" : "Trabalho",
   "description" : "aaa",
   "priority" : 1,
-  "state" : false
-}, {
-  "taskId" : 4472,
-  "endDate" : "2025-05-04",
-  "endDateTime" : null,
-  "taskName" : "lalal",
-  "category" : "Estudos",
-  "description" : "akaaka",
-  "priority" : 2,
-  "state" : false
+  "state" : true
 } ]

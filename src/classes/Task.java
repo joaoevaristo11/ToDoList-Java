@@ -46,25 +46,29 @@ public class Task
         this.state = false;
     }
 
+    public String getTaskName(){return this.taskName;}
+    public String getCategory()
+    {
+        return this.category;
+    }
     public int getPriority()
     {
         return this.priority;
     }
-
     public boolean getState()
     {
         return this.state;
     }
-
     public int getTaskId()
     {
         return this.taskId;
     }
-
     public void markAsDone()
     {
         this.state=true;
     }
+    public LocalDate getEndDate(){return this.endDate;}
+    public LocalDateTime getEndDateHour(){return this.endDateTime;}
 
     private int generateRandomId()
     {
@@ -82,9 +86,13 @@ public class Task
         return id;
     }
 
-    public void setEndDate(LocalDate newDate) {
+    public void setEndDate(LocalDate newDate, boolean isNew) {
+        if (newDate == null) {
+            return;
+        }
+
         if (this.endDate != null && this.endDate.equals(newDate)) {
-            return;  // Se a data não mudou, não faz nada
+            return;
         }
 
         LocalDate now = LocalDate.now();
@@ -93,7 +101,7 @@ public class Task
         int year = newDate.getYear();
         int maxDays = Month.of(month).length(Year.isLeap(year));
 
-        if (newDate.isBefore(now)) {
+        if (isNew && newDate.isBefore(now)) {
             System.out.println("❌ Erro: A data já passou! Escolha uma data futura.");
             return;
         }
@@ -173,7 +181,7 @@ public class Task
                 case 3:
                     System.out.println("Data de Vencimento atual: "+this.endDate);
                     System.out.print("Nova Data de Vencimento(no formato YYYY-MM-DD): ");
-                    setEndDate(LocalDate.parse(scanner.nextLine()));
+                    setEndDate(LocalDate.parse(scanner.nextLine()), true);
                     break;
                 case 4:
                     System.out.println("Prioridade atual: " + this.priority);
@@ -253,4 +261,51 @@ public class Task
 
         System.out.println("✅ Tarefa criada e guardada com sucesso!\n");
     }
+
+    public static void searchTasks(String string) {
+        List<Task> tasks = filehandler.readTasks();
+        List<Task> result = new ArrayList<>();
+
+        for (Task task : tasks) {
+            String category = (task.getCategory() != null) ? task.getCategory() : ""; // Evita NullPointerException
+            String name = (task.getTaskName() != null) ? task.getTaskName() : "";
+
+            if (category.equalsIgnoreCase(string) || name.equalsIgnoreCase(string)) {
+                result.add(task);
+            }
+        }
+
+        if (result.isEmpty()) {
+            System.out.println("🔍 Nenhuma tarefa encontrada para: " + string);
+        } else {
+            for (Task task : result) {
+                task.displayTask();
+            }
+        }
+    }
+
+    public static void sortTask(String option) {
+        List<Task> tasks = filehandler.readTasks(); // Garantir que carregamos as tarefas
+
+        if (tasks.isEmpty()) {
+            System.out.println("📭 Não há tarefas para ordenar.");
+            return;
+        }
+
+        if (option.equalsIgnoreCase("prioridade")) {
+            tasks.sort(Comparator.comparingInt(Task::getPriority).reversed());
+        } else if (option.equalsIgnoreCase("data")) {
+            tasks.sort(Comparator.comparing(Task::getEndDate));
+        } else {
+            System.out.println("❌ Opção inválida. Escolha 'prioridade' ou 'data'.");
+            return;
+        }
+
+        // Mostrar as tarefas ordenadas
+        for (Task task : tasks) {
+            task.displayTask();
+        }
+    }
+
+
 }
