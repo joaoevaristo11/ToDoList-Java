@@ -27,20 +27,23 @@ public class TaskManager {
                     taskService.createTask();
                     break;
                 case 2:
-                    System.out.print("Pretende ordenar as tarefas por prioridade ou data? ");
-                    String sortOption = scanner.nextLine();
-                    taskService.sortTask(sortOption);
-
-                    System.out.print("Pretende pesquisar alguma tarefa ou categoria (s/n)? ");
+                    System.out.print("Pretende fazer alguma ordenação das tarefas(s/n)? ");
+                    String sorN = scanner.nextLine();
+                    if(sorN.equalsIgnoreCase("s")) {
+                        System.out.print("Pretende ordenar as tarefas por prioridade ou data? ");
+                        String sortOption = scanner.nextLine();
+                        taskService.sortTask(sortOption);
+                    }
+                    System.out.print("Pretende pesquisar alguma tarefa ou categoria especifica (s/n)? ");
                     String searchChoice = scanner.nextLine().trim().toLowerCase();
-
                     if (searchChoice.equals("s")) {
                         System.out.print("Digite o nome da tarefa ou a sua categoria: ");
                         String answer = scanner.nextLine();
                         taskService.searchTasks(answer);
+                    }else if (searchChoice.equals("n")){
+                        taskService.showTasks();
                     }
                     break;
-
                 case 3:
                     System.out.print("Digite o ID da tarefa: ");
                     int taskId = scanner.nextInt();
