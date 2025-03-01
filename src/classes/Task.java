@@ -11,9 +11,11 @@ public class Task
 {
     private static final Random random = new Random();
     private static final FileHandler filehandler = new FileHandler();
+    private static final Scanner scanner = new Scanner(System.in);
+
 
     @JsonProperty("subtasks")
-    private List<String> subtasks = new ArrayList<>();
+    private List<SubTask> subtasks = new ArrayList<>();
 
     private int taskId;
 
@@ -64,21 +66,35 @@ public class Task
     {
         return this.taskId;
     }
+    public LocalDateTime getEndDateTime() {return this.endDateTime;}
+
     public void markAsDone()
     {
         this.state=true;
+        for(SubTask subtask:subtasks){
+            subtask.markAsDone();
+        }
     }
-    public LocalDateTime getEndDateTime() {return this.endDateTime;}
 
+    public void addSubTask(SubTask subtask){
+        this.subtasks.add(subtask);
+        System.out.println("✅ Subtarefa adicionada com sucesso!");
+    }
+
+    public void removeSubTask(int subTaskId){
+       boolean remove = subtasks.removeIf(subtask->subtask.getSubTaskId()==subTaskId);
+        if (remove) {
+            System.out.println("✅ Subtarefa removida com sucesso!");
+        } else {
+            System.out.println("❌ Nenhuma subtarefa encontrada com o ID: " + subTaskId);
+        }
+    }
 
     private int generateRandomId()
     {
         List<Task> tasks = filehandler.readTasks();
         Set<Integer> usedIds = new HashSet<>();
-        for(Task task:tasks)
-        {
-            usedIds.add(task.getTaskId());
-        }
+        for(Task task:tasks) usedIds.add(task.getTaskId());
 
         int id;
         do{id = random.nextInt(9000)+1000;}while(usedIds.contains(id));
@@ -128,12 +144,75 @@ public class Task
         System.out.println("Data de vencimento: " + (endDateTime != null ? endDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")) : "Não definida"));
         System.out.println("Prioridade: " + priority);
         System.out.println("Estado: " + (state ? "Concluída ✅" : "Pendente ❌"));
+
+        if(!subtasks.isEmpty()){
+            System.out.println("\n-----Subtarefas associadas-----");
+            for(SubTask subtask:subtasks){
+                subtask.displaySubTask();
+            }
+            System.out.println("-------------------------------");
+        }
         System.out.println("-----------------------------\n");
+    }
+
+    public void editSubTask(){
+        if(this.subtasks.isEmpty()){
+            System.out.println("Esta tarefa não possui sub-tarefas associadas...");
+            return;
+        }
+
+        System.out.println("-----Lista de sub-tarefas-----");
+        for(SubTask subtask:subtasks){
+            subtask.displaySubTask();
+        }
+
+        System.out.print("Digite o id da sub-tarefa: ");
+        int subtaskIdtoEdit = scanner.nextInt();
+        scanner.nextLine();
+
+        SubTask subTaskExist = null;
+        for(SubTask subtask:this.subtasks){
+            if(subtask.getSubTaskId()==subtaskIdtoEdit){
+                subTaskExist = subtask;
+                break;
+            }
+        }
+
+        if(subTaskExist==null){
+            System.out.println("❌ Nenhuma subtarefa encontrada com esse ID.");
+            return;
+        }
+
+        System.out.println("\nO que deseja modificar na subtarefa?");
+        System.out.println("1. Nome");
+        System.out.println("2. Estado (Concluir subtarefa)");
+        System.out.println("0. Cancelar edição");
+        System.out.print("\nEscolha uma opção (0-2): ");
+
+        int suboption = scanner.nextInt();
+        scanner.nextLine();
+        switch(suboption){
+            case 0:
+                System.out.println("Exiting...");
+                break;
+            case 1:
+                System.out.println("Nome atual: "+subTaskExist.getName());
+                System.out.print("Novo nome: ");
+                String newName = scanner.nextLine();
+                subTaskExist.setName(newName);
+                System.out.println("✅ Nome da subtarefa atualizado!");
+                break;
+            case 2:
+                subTaskExist.markAsDone();
+                System.out.println("✅ Subtarefa marcada como concluída!");
+                break;
+            default:
+                System.out.println("❌ Opção inválida! Tente novamente.");
+        }
     }
 
     public void editTask()
     {
-        Scanner scanner = new Scanner(System.in);
         displayTask();
         boolean continuee = true;
         while(continuee) {
@@ -144,6 +223,7 @@ public class Task
             System.out.println("4. Data de vencimento");
             System.out.println("5. Prioridade");
             System.out.println("6. Estado (Concluir tarefa)");
+            System.out.println("7. Modificar sub-tarefa");
             System.out.println("0. Cancelar edição");
             System.out.print("\nInput (0-5): ");
             int option = scanner.nextInt();
@@ -198,6 +278,9 @@ public class Task
                     markAsDone();
                     System.out.println("✅ Tarefa marcada como concluída!");
                     break;
+                case 7:
+                    editSubTask();
+                    break;
                 default:
                     System.out.println("❌ Opção inválida! Tente novamente.");
             }
@@ -205,8 +288,6 @@ public class Task
     }
 
     public static void createTask() {
-        Scanner scanner = new Scanner(System.in);
-
         System.out.println("\n🔹 Criar Nova Tarefa 🔹");
 
         System.out.print("Nome da tarefa: ");
@@ -259,6 +340,20 @@ public class Task
 
         Task newTask = new Task(taskName,category, description, newDateTime, priority);
 
+        System.out.print("Pretende adicionar alguma subtarefa(s/n)? : ");
+        String answer = scanner.nextLine();
+        if(answer.equalsIgnoreCase("s")){
+            boolean next = true;
+            while(next){
+                System.out.print("Nome da subtarefa: ");
+                String subTaskName = scanner.nextLine();
+                SubTask subtask = new SubTask(subTaskName);
+                newTask.addSubTask(subtask);
+                System.out.print("Adicionar outra subtarefa? (s/n): ");
+                next = scanner.nextLine().equalsIgnoreCase("s");
+            }
+        }
+
         filehandler.writeTask(newTask);
 
         System.out.println("✅ Tarefa criada e guardada com sucesso!\n");
@@ -308,10 +403,4 @@ public class Task
             task.displayTask();
         }
     }
-
-    public void addSubTask(){
-
-    }
-
-
 }
