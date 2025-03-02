@@ -81,13 +81,8 @@ public class Task
         System.out.println("✅ Subtarefa adicionada com sucesso!");
     }
 
-    public void removeSubTask(int subTaskId){
-       boolean remove = subtasks.removeIf(subtask->subtask.getSubTaskId()==subTaskId);
-        if (remove) {
-            System.out.println("✅ Subtarefa removida com sucesso!");
-        } else {
-            System.out.println("❌ Nenhuma subtarefa encontrada com o ID: " + subTaskId);
-        }
+    public boolean removeSubTask(int subTaskId) {
+        return subtasks.removeIf(subtask -> subtask.getSubTaskId() == subTaskId);
     }
 
     private int generateRandomId()
@@ -152,7 +147,7 @@ public class Task
             }
             System.out.println("-------------------------------");
         }
-        System.out.println("-----------------------------\n");
+        System.out.println("------------------------------------------\n");
     }
 
     public void editSubTask(){
@@ -294,20 +289,24 @@ public class Task
         String taskName = scanner.nextLine();
         System.out.print("Descrição: ");
         String description = scanner.nextLine();
-        System.out.print("Categoria da tarefa(ex: Trabalho, Estudos, Pessoal)   ): ");
+        System.out.print("Categoria da tarefa (ex: Trabalho, Estudos, Pessoal): ");
         String category = scanner.nextLine();
 
-        //implementar Data
         LocalDate newDate = null;
         LocalTime newTime = LocalTime.MIDNIGHT;
         boolean validate = false;
 
-        while(!validate){
+        // Verificação para garantir que a data é futura
+        while (!validate) {
             System.out.print("Data de vencimento (yyyy-MM-dd): ");
-            try{
+            try {
                 newDate = LocalDate.parse(scanner.nextLine());
-                validate = true;
-            }catch(Exception e){
+                if (newDate.isBefore(LocalDate.now())) {
+                    System.out.println("❌ Erro: A data já passou! Escolha uma data futura.");
+                } else {
+                    validate = true;
+                }
+            } catch (Exception e) {
                 System.out.println("❌ Formato inválido! Use yyyy-MM-dd.");
             }
         }
@@ -315,20 +314,26 @@ public class Task
         System.out.print("Pretende adicionar uma hora à tarefa? (s/n): ");
         String choice = scanner.nextLine();
 
-        if(choice.equalsIgnoreCase("s")){
+        if (choice.equalsIgnoreCase("s")) {
             boolean validateHour = false;
-            while(!validateHour){
+            while (!validateHour) {
                 System.out.print("Digite a hora de vencimento da tarefa (HH:mm): ");
-                try{
+                try {
                     newTime = LocalTime.parse(scanner.nextLine());
-                    validateHour = true;
+
+                    // Se a data escolhida for hoje, verifica se a hora é futura
+                    if (newDate.equals(LocalDate.now()) && newTime.isBefore(LocalTime.now())) {
+                        System.out.println("❌ Erro: A hora já passou! Escolha uma hora futura.");
+                    } else {
+                        validateHour = true;
+                    }
                 } catch (Exception e) {
-                    System.out.println("❌ Formato inválido! Use HH:mm");
+                    System.out.println("❌ Formato inválido! Use HH:mm.");
                 }
             }
         }
 
-        LocalDateTime newDateTime = LocalDateTime.of(newDate,newTime);
+        LocalDateTime newDateTime = LocalDateTime.of(newDate, newTime);
         System.out.println("✅ Data de vencimento definida para: " + newDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
 
         int priority;
@@ -338,13 +343,13 @@ public class Task
             scanner.nextLine();
         } while (priority < 1 || priority > 3);
 
-        Task newTask = new Task(taskName,category, description, newDateTime, priority);
+        Task newTask = new Task(taskName, category, description, newDateTime, priority);
 
         System.out.print("Pretende adicionar alguma subtarefa(s/n)? : ");
         String answer = scanner.nextLine();
-        if(answer.equalsIgnoreCase("s")){
+        if (answer.equalsIgnoreCase("s")) {
             boolean next = true;
-            while(next){
+            while (next) {
                 System.out.print("Nome da subtarefa: ");
                 String subTaskName = scanner.nextLine();
                 SubTask subtask = new SubTask(subTaskName);
@@ -355,9 +360,9 @@ public class Task
         }
 
         filehandler.writeTask(newTask);
-
         System.out.println("✅ Tarefa criada e guardada com sucesso!\n");
     }
+
 
     public static void searchTasks(String string) {
         List<Task> tasks = filehandler.readTasks();

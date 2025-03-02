@@ -51,10 +51,23 @@ public class TaskManager {
                     taskService.editTask(taskId);
                     break;
                 case 4:
-                    System.out.print("Digite o ID da tarefa a eliminar: ");
-                    int taskIdToDelete = scanner.nextInt();
+                    System.out.print("\n1. Eliminar tarefa\n2. Eliminar sub-tarefa\n\nDigite a sua opção: ");
+                    int op = scanner.nextInt();
                     scanner.nextLine();
-                    taskService.deleteTask(taskIdToDelete);
+
+                    if (op == 1) {
+                        System.out.print("Digite o ID da tarefa a eliminar: ");
+                        int taskIdToDelete = scanner.nextInt();
+                        scanner.nextLine();
+                        taskService.deleteTask(taskIdToDelete);
+                    } else if (op == 2) {
+                        System.out.print("Digite o ID da sub-tarefa a eliminar: ");
+                        int subtaskIdToDelete = scanner.nextInt();
+                        scanner.nextLine();
+                        taskService.deleteSubTask(subtaskIdToDelete); // Agora chama o método correto
+                    } else {
+                        System.out.println("❌ Opção inválida!");
+                    }
                     break;
                 case 5:
                     System.out.println("👋 Saindo do programa...");

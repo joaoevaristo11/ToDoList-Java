@@ -43,6 +43,26 @@ public class FileHandler implements TaskStorage {
     }
 
     @Override
+    public void deleteSubTask(int subtaskId) {
+        List<Task> tasks = readTasks();
+        boolean found = false;
+
+        for (Task task : tasks) {
+            if (task.removeSubTask(subtaskId)) {
+                found = true;
+            }
+        }
+
+        if (found) {
+            saveTasksToFile(tasks); // Só grava se algo for removido
+            System.out.println("✅ Subtarefa removida com sucesso!");
+        } else {
+            System.out.println("❌ Nenhuma subtarefa encontrada com o ID: " + subtaskId);
+        }
+    }
+
+
+    @Override
     public void updateTaskInFile(Task updatedTask) {
         List<Task> tasks = readTasks();
         for (int i = 0; i < tasks.size(); i++) {

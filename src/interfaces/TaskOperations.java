@@ -11,4 +11,5 @@ public interface TaskOperations {
     Task getTaskById(int taskId);
     void searchTasks(String string);
     void sortTask(String option);
+    void deleteSubTask(int subtaskId);
 }

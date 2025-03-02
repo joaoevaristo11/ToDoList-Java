@@ -53,4 +53,9 @@ public class TaskService implements interfaces.TaskOperations {
     public void sortTask(String option) {
         Task.sortTask(option);
     }
+
+    @Override
+    public void deleteSubTask(int subtaskId) {
+        filehandler.deleteSubTask(subtaskId);
+    }
 }

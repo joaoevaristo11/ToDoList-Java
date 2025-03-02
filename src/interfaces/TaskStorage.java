@@ -9,4 +9,6 @@ public interface TaskStorage {
     void deleteTask(int taskId);
     void updateTaskInFile(Task updatedTask);
     Task getTaskById(int taskId);
+    void deleteSubTask(int taskId);
+
 }
