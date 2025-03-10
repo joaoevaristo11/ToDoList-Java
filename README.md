@@ -31,7 +31,7 @@ This is a **To-Do List** project developed in **Java**, allowing users to create
 
 ## 2. **Compile the project**  
 
-javac src/*.java
+javac -d classes src/*.java
 
 ## 3. **Open the folder**
 
@@ -39,4 +39,9 @@ cd classes
 
 ## 4. **Run the program**  
 
-java src.TaskManager
+java TaskManager
+
+# ScreenShots 📷
+
+![image](https://github.com/user-attachments/assets/9dc727c3-6645-498c-9140-827bc91fa25e)
+
