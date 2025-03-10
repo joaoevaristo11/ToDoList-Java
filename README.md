@@ -33,5 +33,10 @@ This is a **To-Do List** project developed in **Java**, allowing users to create
 
 javac src/*.java
 
-## 3. **Run the program**  
+## 3. **Open the folder**
 
+cd classes
+
+## 4. **Run the program**  
+
+java src.TaskManager
