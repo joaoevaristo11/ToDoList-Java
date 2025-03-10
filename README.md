@@ -1,21 +1,37 @@
-# To-Do List em Java 📝
+# To-Do List in Java 📝
 
-Este é um projeto de **To-Do List** desenvolvido em **Java**, que permite criar, editar e eliminar tarefas, bem como associar ficheiros a cada uma delas. O objetivo deste projeto é praticar conceitos de **POO (Programação Orientada a Objetos)**, **manipulação de ficheiros** e **gestão de tarefas**.
+This is a **To-Do List** project developed in **Java**, allowing users to create, edit, and delete tasks, as well as attach files to each task. The goal of this project is to practice **OOP (Object-Oriented Programming)**, **file handling**, and **task management**.
 
-## 🚀 Funcionalidades
+## 🚀 Features
 
-- ✅ Criar e remover tarefas
-- ✏️ Editar tarefas existentes
-- 📂 Associar ficheiros às tarefas
-- 💾 Guardar e carregar tarefas de um ficheiro
-- 🖥️ Interface simples via terminal
+- ✅ Create and delete tasks  
 
-## 🛠️ Tecnologias Utilizadas
+- ✏️ Edit existing tasks  
 
-- **Java 17+** (ou superior)
-- **Manipulação de ficheiros**
-- **OOP (Programação Orientada a Objetos)**
+- 📂 Attach files to tasks  
 
-## 📦 Estrutura do Projeto
+- 💾 Save and load tasks from a file  
 
+- 🖥️ Simple terminal-based interface  
+
+## 🛠️ Technologies Used
+
+- **Java **  
+
+- **File handling**  
+
+- **OOP (Object-Oriented Programming)**  
+
+
+## 🔧 How to Use
+
+## 1. **Clone the repository**  
+
+   git clone https://github.com/your-username/todo-list-java.git
+
+## 2. **Compile the project**  
+
+javac src/*.java
+
+## 3. **Run the program**  
 
